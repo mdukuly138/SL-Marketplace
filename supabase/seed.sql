@@ -1,0 +1,3 @@
+-- Seed data placeholder.
+-- This file will be populated once the Supabase schema and migrations
+-- are defined in a later milestone. No demo/fake rows are added here yet.
