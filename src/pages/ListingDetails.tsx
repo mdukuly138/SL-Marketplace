@@ -3,6 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ChevronLeft, MapPin, Clock, MessageCircle } from 'lucide-react'
 import { getListingById } from '@/services/listings'
 import { getProfile } from '@/services/profiles'
+import { getOrCreateConversation } from '@/services/conversations'
+import { useAuth } from '@/hooks/useAuth'
 import type { Listing, Seller } from '@/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -11,9 +13,11 @@ import { VerificationBadge } from '@/components/ui/VerificationBadge'
 export function ListingDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [listing, setListing] = useState<Listing | null>(null)
   const [seller, setSeller] = useState<Seller | null>(null)
   const [loading, setLoading] = useState(true)
+  const [messaging, setMessaging] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -31,6 +35,18 @@ export function ListingDetails() {
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
   }, [id])
+
+  async function handleMessageSeller() {
+    if (!user) { navigate('/login'); return }
+    if (!seller || !listing) return
+    setMessaging(true)
+    try {
+      const conversationId = await getOrCreateConversation({ currentUserId: user.id, sellerId: seller.id, listingId: listing.id })
+      navigate(`/messages/${conversationId}`)
+    } finally {
+      setMessaging(false)
+    }
+  }
 
   if (loading) return <div className="px-4 pt-6"><p className="text-muted text-sm">Loading...</p></div>
   if (!listing) return <div className="px-4 pt-6"><p className="text-muted">Listing not found.</p></div>
@@ -51,9 +67,7 @@ export function ListingDetails() {
           <ChevronLeft className="w-5 h-5" />
         </button>
         {gallery.length > 1 && (
-          <span className="absolute bottom-3 right-3 bg-base/70 backdrop-blur rounded-pill px-2.5 py-1 text-xs font-semibold">
-            1 / {gallery.length}
-          </span>
+          <span className="absolute bottom-3 right-3 bg-base/70 backdrop-blur rounded-pill px-2.5 py-1 text-xs font-semibold">1 / {gallery.length}</span>
         )}
       </div>
 
@@ -93,9 +107,9 @@ export function ListingDetails() {
           </Link>
         )}
 
-        <Button variant="primary" size="lg" className="w-full mt-5 gap-2">
+        <Button variant="primary" size="lg" className="w-full mt-5 gap-2" onClick={handleMessageSeller} disabled={messaging}>
           <MessageCircle className="w-4 h-4" />
-          Message seller
+          {messaging ? 'Opening...' : 'Message seller'}
         </Button>
       </div>
     </div>
