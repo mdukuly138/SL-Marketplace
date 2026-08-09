@@ -35,13 +35,26 @@ export function ListingDetails() {
   if (loading) return <div className="px-4 pt-6"><p className="text-muted text-sm">Loading...</p></div>
   if (!listing) return <div className="px-4 pt-6"><p className="text-muted">Listing not found.</p></div>
 
+  const gallery = listing.images && listing.images.length > 0 ? listing.images : [listing.imageUrl]
+
   return (
     <div className="pb-6">
-      <div className="relative aspect-square bg-elevated">
-        <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
+      <div className="relative">
+        <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory">
+          {gallery.map((url, i) => (
+            <div key={i} className="w-full shrink-0 snap-center aspect-square bg-elevated">
+              <img src={url} alt={listing.title} className="w-full h-full object-cover" />
+            </div>
+          ))}
+        </div>
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 w-9 h-9 rounded-full bg-base/70 backdrop-blur flex items-center justify-center">
           <ChevronLeft className="w-5 h-5" />
         </button>
+        {gallery.length > 1 && (
+          <span className="absolute bottom-3 right-3 bg-base/70 backdrop-blur rounded-pill px-2.5 py-1 text-xs font-semibold">
+            1 / {gallery.length}
+          </span>
+        )}
       </div>
 
       <div className="px-4 pt-4">
