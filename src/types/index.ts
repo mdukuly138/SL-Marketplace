@@ -15,6 +15,7 @@ export interface Listing {
   price: number
   negotiable: boolean
   imageUrl: string
+  images?: string[]
   location: string
   condition: Condition
   category: string
