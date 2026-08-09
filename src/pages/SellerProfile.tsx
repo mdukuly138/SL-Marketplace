@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { MapPin, MessageCircle } from 'lucide-react'
 import { getProfile } from '@/services/profiles'
 import { getListingsBySeller } from '@/services/listings'
+import { getOrCreateConversation } from '@/services/conversations'
+import { useAuth } from '@/hooks/useAuth'
 import type { Seller, Listing } from '@/types'
 import { ListingCard } from '@/components/listings/ListingCard'
 import { VerificationBadge } from '@/components/ui/VerificationBadge'
@@ -10,9 +12,12 @@ import { Button } from '@/components/ui/Button'
 
 export function SellerProfile() {
   const { id } = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
   const [seller, setSeller] = useState<Seller | null>(null)
   const [sellerListings, setSellerListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
+  const [messaging, setMessaging] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -27,6 +32,18 @@ export function SellerProfile() {
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
   }, [id])
+
+  async function handleMessageSeller() {
+    if (!user) { navigate('/login'); return }
+    if (!seller) return
+    setMessaging(true)
+    try {
+      const conversationId = await getOrCreateConversation({ currentUserId: user.id, sellerId: seller.id })
+      navigate(`/messages/${conversationId}`)
+    } finally {
+      setMessaging(false)
+    }
+  }
 
   if (loading) return <div className="px-4 pt-6"><p className="text-muted text-sm">Loading...</p></div>
   if (!seller) return <div className="px-4 pt-6"><p className="text-muted">Seller not found.</p></div>
@@ -43,9 +60,9 @@ export function SellerProfile() {
         </div>
         <p className="flex items-center gap-1 text-muted text-xs mt-1"><MapPin className="w-3.5 h-3.5" /> {seller.location}</p>
         {seller.about && <p className="text-sm text-ink/80 mt-3 max-w-xs">{seller.about}</p>}
-        <Button variant="primary" size="md" className="mt-4 gap-2">
+        <Button variant="primary" size="md" className="mt-4 gap-2" onClick={handleMessageSeller} disabled={messaging}>
           <MessageCircle className="w-4 h-4" />
-          Message seller
+          {messaging ? 'Opening...' : 'Message seller'}
         </Button>
       </div>
 
