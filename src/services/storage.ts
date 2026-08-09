@@ -1,9 +1,20 @@
 import { supabase } from '@/lib/supabase'
 
+async function convertHeicIfNeeded(file: File): Promise<File> {
+  const isHeic = file.type === 'image/heic' || file.type === 'image/heif' || /\.heic$|\.heif$/i.test(file.name)
+  if (!isHeic) return file
+
+  const heic2any = (await import('heic2any')).default
+  const convertedBlob = (await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 })) as Blob
+  const newName = file.name.replace(/\.(heic|heif)$/i, '.jpg')
+  return new File([convertedBlob], newName, { type: 'image/jpeg' })
+}
+
 export async function uploadListingImages(files: File[], userId: string): Promise<string[]> {
   const urls: string[] = []
 
-  for (const file of files) {
+  for (const rawFile of files) {
+    const file = await convertHeicIfNeeded(rawFile)
     const ext = file.name.split('.').pop()
     const path = `${userId}/${crypto.randomUUID()}.${ext}`
 
