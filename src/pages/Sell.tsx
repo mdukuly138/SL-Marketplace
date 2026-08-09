@@ -1,18 +1,27 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { X, ImagePlus } from 'lucide-react'
 import { categories } from '@/data/categories'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
 import { createListing } from '@/services/listings'
+import { uploadListingImages } from '@/services/storage'
 import { cn } from '@/lib/utils'
 
 const conditions = ['new', 'like-new', 'used'] as const
+const MAX_PHOTOS = 6
+
+interface PhotoItem {
+  file: File
+  previewUrl: string
+}
 
 export function Sell() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  const [photos, setPhotos] = useState<PhotoItem[]>([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
@@ -20,7 +29,6 @@ export function Sell() {
   const [category, setCategory] = useState<string>(categories[0])
   const [location, setLocation] = useState('')
   const [condition, setCondition] = useState<(typeof conditions)[number]>('used')
-  const [imageUrl, setImageUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,21 +41,38 @@ export function Sell() {
     )
   }
 
+  function handlePhotoSelect(e: ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files ?? [])
+    if (selected.length === 0) return
+    setPhotos((prev) => {
+      const combined = [...prev, ...selected.map((file) => ({ file, previewUrl: URL.createObjectURL(file) }))]
+      return combined.slice(0, MAX_PHOTOS)
+    })
+    e.target.value = ''
+  }
+
+  function removePhoto(index: number) {
+    setPhotos((prev) => {
+      URL.revokeObjectURL(prev[index].previewUrl)
+      return prev.filter((_, i) => i !== index)
+    })
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
-
     if (!user) return
 
-    if (!title || !price || !location || !imageUrl) {
-      setError('Please fill in title, price, location, and an image URL.')
+    if (!title || !price || !location || photos.length === 0) {
+      setError('Please add at least one photo, and fill in title, price, and location.')
       return
     }
 
     setLoading(true)
     try {
+      const imageUrls = await uploadListingImages(photos.map((p) => p.file), user.id)
       const listing = await createListing({
-        title, description, price: Number(price), negotiable, imageUrl,
+        title, description, price: Number(price), negotiable, images: imageUrls,
         location, condition, category, sellerId: user.id,
       })
       navigate(`/listing/${listing.id}`)
@@ -61,14 +86,32 @@ export function Sell() {
   return (
     <div className="px-4 pt-6 pb-8">
       <h1 className="font-extrabold text-2xl mb-1">Create a listing</h1>
-      <p className="text-muted text-sm mb-6">
-        Photo upload is coming in the next update — for now, paste a direct image link.
-      </p>
+      <p className="text-muted text-sm mb-6">Add up to {MAX_PHOTOS} photos from your gallery.</p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="text-sm font-semibold mb-2 block">Image URL</label>
-          <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://..." />
+          <label className="text-sm font-semibold mb-2 block">Photos</label>
+          <div className="grid grid-cols-3 gap-2">
+            {photos.map((photo, i) => (
+              <div key={i} className="relative aspect-square rounded-2xl overflow-hidden bg-elevated">
+                <img src={photo.previewUrl} alt="" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(i)}
+                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-base/80 flex items-center justify-center"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+            {photos.length < MAX_PHOTOS && (
+              <label className="aspect-square rounded-2xl bg-surface border border-dashed border-border flex flex-col items-center justify-center gap-1 text-muted cursor-pointer">
+                <ImagePlus className="w-5 h-5" />
+                <span className="text-[11px]">Add photo</span>
+                <input type="file" accept="image/*" multiple onChange={handlePhotoSelect} className="hidden" />
+              </label>
+            )}
+          </div>
         </div>
 
         <div>
