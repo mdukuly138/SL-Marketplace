@@ -17,7 +17,7 @@ export function Sell() {
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
   const [negotiable, setNegotiable] = useState(false)
-  const [category, setCategory] = useState(categories[0])
+  const [category, setCategory] = useState<string>(categories[0])
   const [location, setLocation] = useState('')
   const [condition, setCondition] = useState<(typeof conditions)[number]>('used')
   const [imageUrl, setImageUrl] = useState('')
@@ -36,6 +36,8 @@ export function Sell() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+
+    if (!user) return
 
     if (!title || !price || !location || !imageUrl) {
       setError('Please fill in title, price, location, and an image URL.')
