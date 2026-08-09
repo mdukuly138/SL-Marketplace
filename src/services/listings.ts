@@ -8,6 +8,7 @@ type ListingRow = {
   price: number
   negotiable: boolean
   image_url: string
+  images: string[] | null
   location: string
   condition: 'new' | 'like-new' | 'used'
   category: string
@@ -23,6 +24,7 @@ function mapListing(row: ListingRow): Listing {
     price: row.price,
     negotiable: row.negotiable,
     imageUrl: row.image_url,
+    images: row.images && row.images.length > 0 ? row.images : [row.image_url],
     location: row.location,
     condition: row.condition,
     category: row.category,
@@ -36,7 +38,7 @@ function mapListing(row: ListingRow): Listing {
 }
 
 const SELECT = `
-  id, title, description, price, negotiable, image_url, location, condition, category, created_at, seller_id,
+  id, title, description, price, negotiable, image_url, images, location, condition, category, created_at, seller_id,
   profiles ( id, display_name, verified )
 `
 
@@ -67,7 +69,7 @@ export interface NewListingInput {
   description: string
   price: number
   negotiable: boolean
-  imageUrl: string
+  images: string[]
   location: string
   condition: 'new' | 'like-new' | 'used'
   category: string
@@ -82,7 +84,8 @@ export async function createListing(input: NewListingInput) {
       description: input.description,
       price: input.price,
       negotiable: input.negotiable,
-      image_url: input.imageUrl,
+      image_url: input.images[0],
+      images: input.images,
       location: input.location,
       condition: input.condition,
       category: input.category,
@@ -93,4 +96,4 @@ export async function createListing(input: NewListingInput) {
 
   if (error) throw error
   return data
-      }
+}
