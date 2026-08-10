@@ -1,45 +1,4 @@
 import type { Post } from '@/types'
 
-export const posts: Post[] = [
-  {
-    id: 'p1',
-    author: { id: 's1', name: "Aisha's Boutique", avatarUrl: 'https://picsum.photos/seed/aisha/200/200', verified: true },
-    imageUrl: 'https://picsum.photos/seed/ankarapost/600/750',
-    caption: 'New Ankara arrivals just in! Custom tailoring available across Bo and Freetown.',
-    likes: 128,
-    comments: 14,
-    listingId: 'l2',
-    createdAt: '2026-08-07T09:00:00Z',
-  },
-  {
-    id: 'p2',
-    author: { id: 's2', name: 'Kamara Motors', avatarUrl: 'https://picsum.photos/seed/kamara/200/200', verified: true },
-    imageUrl: 'https://picsum.photos/seed/corollapost/600/750',
-    videoPlaceholder: true,
-    caption: 'Full walkaround of this clean 2015 Corolla — link in listing for more photos.',
-    likes: 96,
-    comments: 21,
-    listingId: 'l3',
-    createdAt: '2026-08-05T15:00:00Z',
-  },
-  {
-    id: 'p3',
-    author: { id: 's5', name: 'Glow Beauty Bar', avatarUrl: 'https://picsum.photos/seed/glow/200/200', verified: false },
-    imageUrl: 'https://picsum.photos/seed/glowpost/600/750',
-    caption: 'Booking slots open for this weekend — braiding, twists, and treatments. DM to reserve.',
-    likes: 74,
-    comments: 9,
-    listingId: 'l6',
-    createdAt: '2026-08-07T08:30:00Z',
-  },
-  {
-    id: 'p4',
-    author: { id: 's6', name: 'Freetown Tech Store', avatarUrl: 'https://picsum.photos/seed/techstore/200/200', verified: true },
-    imageUrl: 'https://picsum.photos/seed/techpost/600/750',
-    caption: 'Restocked: UK used phones tested and unlocked. Trade-ins welcome.',
-    likes: 152,
-    comments: 27,
-    listingId: 'l1',
-    createdAt: '2026-08-07T10:30:00Z',
-  },
-]
+// Demo posts are no longer used — Home now pulls real posts from Supabase.
+export const posts: Post[] = []
