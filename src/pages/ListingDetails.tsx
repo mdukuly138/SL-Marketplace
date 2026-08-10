@@ -53,6 +53,7 @@ export function ListingDetails() {
   if (!listing) return <div className="px-4 pt-6"><p className="text-muted">Listing not found.</p></div>
 
   const gallery = listing.images && listing.images.length > 0 ? listing.images : [listing.imageUrl]
+  const isOwner = user?.id === listing.seller.id
 
   return (
     <div className="pb-6">
@@ -79,6 +80,14 @@ export function ListingDetails() {
       </div>
 
       <div className="px-4 pt-4">
+        {isOwner && listing.status !== 'approved' && (
+          <div className={`mb-3 rounded-2xl p-3 text-sm ${listing.status === 'pending' ? 'bg-surface border border-border text-muted' : 'bg-alert/10 border border-alert/30 text-alert'}`}>
+            {listing.status === 'pending'
+              ? "This listing is awaiting admin review — only you can see it right now."
+              : 'This listing was rejected by an admin and is not visible to buyers.'}
+          </div>
+        )}
+
         <div className="flex gap-2 mb-3">
           <Badge tone="ember">{listing.condition}</Badge>
           {listing.negotiable && <Badge tone="alert">Negotiable</Badge>}
@@ -114,10 +123,12 @@ export function ListingDetails() {
           </Link>
         )}
 
-        <Button variant="primary" size="lg" className="w-full mt-5 gap-2" onClick={handleMessageSeller} disabled={messaging}>
-          <MessageCircle className="w-4 h-4" />
-          {messaging ? 'Opening...' : 'Message seller'}
-        </Button>
+        {!isOwner && (
+          <Button variant="primary" size="lg" className="w-full mt-5 gap-2" onClick={handleMessageSeller} disabled={messaging}>
+            <MessageCircle className="w-4 h-4" />
+            {messaging ? 'Opening...' : 'Message seller'}
+          </Button>
+        )}
       </div>
     </div>
   )
