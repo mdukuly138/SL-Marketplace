@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { MapPin, MessageCircle } from 'lucide-react'
 import { getProfile } from '@/services/profiles'
 import { getListingsBySeller } from '@/services/listings'
+import { getPostsBySeller } from '@/services/posts'
 import { getOrCreateConversation } from '@/services/conversations'
 import { getReviewsForSeller, getRatingSummary, submitReview, type Review } from '@/services/reviews'
 import { useAuth } from '@/hooks/useAuth'
-import type { Seller, Listing } from '@/types'
+import type { Seller, Listing, Post } from '@/types'
 import { ListingCard } from '@/components/listings/ListingCard'
+import { PostCard } from '@/components/social/PostCard'
 import { VerificationBadge } from '@/components/ui/VerificationBadge'
 import { Button } from '@/components/ui/Button'
 import { ShareButton } from '@/components/ui/ShareButton'
@@ -19,6 +21,7 @@ export function SellerProfile() {
   const { user } = useAuth()
   const [seller, setSeller] = useState<Seller | null>(null)
   const [sellerListings, setSellerListings] = useState<Listing[]>([])
+  const [sellerPosts, setSellerPosts] = useState<Post[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [messaging, setMessaging] = useState(false)
@@ -27,13 +30,15 @@ export function SellerProfile() {
   const [submitting, setSubmitting] = useState(false)
 
   async function loadAll(sellerId: string) {
-    const [profileData, listingsData, reviewsData] = await Promise.all([
+    const [profileData, listingsData, postsData, reviewsData] = await Promise.all([
       getProfile(sellerId),
       getListingsBySeller(sellerId),
+      getPostsBySeller(sellerId, user?.id),
       getReviewsForSeller(sellerId),
     ])
     setSeller(profileData)
     setSellerListings(listingsData)
+    setSellerPosts(postsData)
     setReviews(reviewsData)
     if (user) {
       const mine = reviewsData.find((r) => r.reviewer.id === user.id)
@@ -128,6 +133,13 @@ export function SellerProfile() {
         </div>
       )}
 
+      {sellerPosts.length > 0 && (
+        <div className="mt-8 px-4 space-y-4">
+          <h2 className="font-bold text-lg">Posts</h2>
+          {sellerPosts.map((p) => <PostCard key={p.id} post={p} />)}
+        </div>
+      )}
+
       <div className="mt-8 px-4">
         <h2 className="font-bold text-lg mb-3">Reviews</h2>
 
@@ -177,4 +189,4 @@ export function SellerProfile() {
       </div>
     </div>
   )
-}
+      }
