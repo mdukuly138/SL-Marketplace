@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Store, Receipt, Heart, Settings, ChevronRight, ShieldCheck, LogOut, Camera } from 'lucide-react'
+import { Store, Receipt, Heart, Settings, ChevronRight, ShieldCheck, LogOut, Camera, LayoutDashboard } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ShareButton } from '@/components/ui/ShareButton'
@@ -16,7 +16,7 @@ const menuItems = [
 ]
 
 export function Profile() {
-  const { user, loading, signOut } = useAuth()
+  const { user, loading, isAdmin, signOut } = useAuth()
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>()
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -91,6 +91,19 @@ export function Profile() {
           </Link>
         )}
       </Card>
+
+      {isAdmin && (
+        <Link to="/admin" className="w-full flex items-center gap-3 p-4 rounded-2xl bg-ember/10 border border-ember/30 mb-6">
+          <div className="w-10 h-10 rounded-full bg-ember/20 flex items-center justify-center">
+            <LayoutDashboard className="w-4 h-4 text-ember" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-sm font-semibold text-ember">Admin Dashboard</p>
+            <p className="text-muted text-xs">Manage users, listings, moderation</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-ember" />
+        </Link>
+      )}
 
       <Card className="p-4 mb-6 flex items-center gap-3">
         <ShieldCheck className="w-5 h-5 text-muted" />
