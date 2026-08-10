@@ -14,6 +14,9 @@ import { SellerProfile } from './pages/SellerProfile'
 import { SignUp } from './pages/SignUp'
 import { Login } from './pages/Login'
 import { VerifyEmail } from './pages/VerifyEmail'
+import { AdminDashboard } from './pages/AdminDashboard'
+import { AdminListings } from './pages/AdminListings'
+import { AdminUsers } from './pages/AdminUsers'
 
 function App() {
   return (
@@ -33,6 +36,9 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<VerifyEmail />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/listings" element={<AdminListings />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
       </Routes>
     </AuthProvider>
