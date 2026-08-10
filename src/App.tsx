@@ -17,6 +17,7 @@ import { VerifyEmail } from './pages/VerifyEmail'
 import { AdminDashboard } from './pages/AdminDashboard'
 import { AdminListings } from './pages/AdminListings'
 import { AdminUsers } from './pages/AdminUsers'
+import { AdminPendingListings } from './pages/AdminPendingListings'
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/listings" element={<AdminListings />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/pending" element={<AdminPendingListings />} />
         </Route>
       </Routes>
     </AuthProvider>
