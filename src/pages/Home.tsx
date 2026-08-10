@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { MapPin, Search as SearchIcon } from 'lucide-react'
-import { posts } from '@/data/posts'
 import { categories } from '@/data/categories'
 import { useListings } from '@/hooks/useListings'
 import { ListingCard } from '@/components/listings/ListingCard'
-import { PostCard } from '@/components/social/PostCard'
+import { ListingFeedCard } from '@/components/social/ListingFeedCard'
 import { Input } from '@/components/ui/Input'
 
 export function Home() {
@@ -36,27 +35,32 @@ export function Home() {
         ))}
       </div>
 
-      <div className="px-4 mb-2">
-        <h2 className="font-bold text-lg">Featured</h2>
-      </div>
-
       {loading ? (
         <p className="px-4 text-muted text-sm">Loading listings...</p>
-      ) : featured.length === 0 ? (
-        <p className="px-4 text-muted text-sm">No listings yet — be the first to sell something!</p>
-      ) : (
-        <div className="pl-4 pb-6 flex gap-3 overflow-x-auto no-scrollbar">
-          {featured.map((listing) => (
-            <div key={listing.id} className="w-40 shrink-0">
-              <ListingCard listing={listing} />
-            </div>
-          ))}
+      ) : listings.length === 0 ? (
+        <div className="px-4 text-center mt-10">
+          <p className="text-muted text-sm">No listings yet — be the first to sell something on SL Marketplace!</p>
         </div>
-      )}
+      ) : (
+        <>
+          <div className="px-4 mb-2">
+            <h2 className="font-bold text-lg">Featured</h2>
+          </div>
+          <div className="pl-4 pb-6 flex gap-3 overflow-x-auto no-scrollbar">
+            {featured.map((listing) => (
+              <div key={listing.id} className="w-40 shrink-0">
+                <ListingCard listing={listing} />
+              </div>
+            ))}
+          </div>
 
-      <div className="px-4 space-y-4">
-        {posts.map((post) => <PostCard key={post.id} post={post} />)}
-      </div>
+          <div className="px-4 space-y-4">
+            {listings.map((listing) => (
+              <ListingFeedCard key={listing.id} listing={listing} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
