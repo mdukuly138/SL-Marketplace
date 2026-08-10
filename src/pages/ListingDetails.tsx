@@ -9,6 +9,7 @@ import type { Listing, Seller } from '@/types'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { VerificationBadge } from '@/components/ui/VerificationBadge'
+import { ShareButton } from '@/components/ui/ShareButton'
 
 export function ListingDetails() {
   const { id } = useParams()
@@ -66,6 +67,12 @@ export function ListingDetails() {
         <button onClick={() => navigate(-1)} className="absolute top-4 left-4 w-9 h-9 rounded-full bg-base/70 backdrop-blur flex items-center justify-center">
           <ChevronLeft className="w-5 h-5" />
         </button>
+        <ShareButton
+          title={listing.title}
+          text={`Check out "${listing.title}" on SL Marketplace — Le ${listing.price.toLocaleString()}`}
+          url={`${window.location.origin}/listing/${listing.id}`}
+          className="absolute top-4 right-4"
+        />
         {gallery.length > 1 && (
           <span className="absolute bottom-3 right-3 bg-base/70 backdrop-blur rounded-pill px-2.5 py-1 text-xs font-semibold">1 / {gallery.length}</span>
         )}
