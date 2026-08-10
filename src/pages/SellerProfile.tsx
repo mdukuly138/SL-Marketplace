@@ -9,6 +9,7 @@ import type { Seller, Listing } from '@/types'
 import { ListingCard } from '@/components/listings/ListingCard'
 import { VerificationBadge } from '@/components/ui/VerificationBadge'
 import { Button } from '@/components/ui/Button'
+import { ShareButton } from '@/components/ui/ShareButton'
 
 export function SellerProfile() {
   const { id } = useParams()
@@ -50,7 +51,13 @@ export function SellerProfile() {
 
   return (
     <div className="pb-8">
-      <div className="px-4 pt-6 flex flex-col items-center text-center">
+      <div className="relative px-4 pt-6 flex flex-col items-center text-center">
+        <ShareButton
+          title={seller.name}
+          text={`Check out ${seller.name} on SL Marketplace`}
+          url={`${window.location.origin}/seller/${seller.id}`}
+          className="absolute top-4 right-4"
+        />
         <div className="w-20 h-20 rounded-full bg-elevated overflow-hidden">
           {seller.avatarUrl && <img src={seller.avatarUrl} alt={seller.name} className="w-full h-full object-cover" />}
         </div>
