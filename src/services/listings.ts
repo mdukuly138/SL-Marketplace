@@ -97,3 +97,29 @@ export async function createListing(input: NewListingInput) {
   if (error) throw error
   return data
 }
+
+export type UpdateListingInput = Partial<Omit<NewListingInput, 'sellerId'>>
+
+export async function updateListing(id: string, input: UpdateListingInput) {
+  const payload: Record<string, unknown> = {}
+  if (input.title !== undefined) payload.title = input.title
+  if (input.description !== undefined) payload.description = input.description
+  if (input.price !== undefined) payload.price = input.price
+  if (input.negotiable !== undefined) payload.negotiable = input.negotiable
+  if (input.images !== undefined) {
+    payload.image_url = input.images[0]
+    payload.images = input.images
+  }
+  if (input.location !== undefined) payload.location = input.location
+  if (input.condition !== undefined) payload.condition = input.condition
+  if (input.category !== undefined) payload.category = input.category
+
+  const { data, error } = await supabase.from('listings').update(payload).eq('id', id).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteListing(id: string) {
+  const { error } = await supabase.from('listings').delete().eq('id', id)
+  if (error) throw error
+  }
