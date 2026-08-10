@@ -2,11 +2,18 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { MapPin, Pencil, Trash2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { getListingsBySeller, deleteListing } from '@/services/listings'
-import type { Listing } from '@/types'
+import { getMyListings, deleteListing } from '@/services/listings'
+import type { Listing, ListingStatus } from '@/types'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
+
+const statusConfig: Record<ListingStatus, { label: string; tone: 'default' | 'success' | 'alert' }> = {
+  pending: { label: 'Pending review', tone: 'default' },
+  approved: { label: 'Live', tone: 'success' },
+  rejected: { label: 'Rejected', tone: 'alert' },
+}
 
 export function MyListings() {
   const { user } = useAuth()
@@ -19,7 +26,7 @@ export function MyListings() {
   useEffect(() => {
     if (!user) { setLoading(false); return }
     let active = true
-    getListingsBySeller(user.id)
+    getMyListings(user.id)
       .then((data) => { if (active) setListings(data) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
@@ -66,9 +73,12 @@ export function MyListings() {
                 <img src={listing.imageUrl} alt={listing.title} className="w-full h-full object-cover" />
               </Link>
               <div className="flex-1 min-w-0">
-                <Link to={`/listing/${listing.id}`}>
-                  <p className="text-sm font-semibold truncate">{listing.title}</p>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link to={`/listing/${listing.id}`} className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{listing.title}</p>
+                  </Link>
+                  <Badge tone={statusConfig[listing.status].tone}>{statusConfig[listing.status].label}</Badge>
+                </div>
                 <p className="text-ember text-sm font-bold tabular-nums">Le {listing.price.toLocaleString()}</p>
                 <p className="flex items-center gap-1 text-muted text-xs mt-0.5">
                   <MapPin className="w-3 h-3" /> {listing.location}
