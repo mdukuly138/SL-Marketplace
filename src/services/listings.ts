@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+  import { supabase } from '@/lib/supabase'
 import type { Listing } from '@/types'
 
 type ListingRow = {
@@ -14,7 +14,7 @@ type ListingRow = {
   category: string
   created_at: string
   seller_id: string
-  profiles: { id: string; display_name: string; verified: boolean } | null
+  profiles: { id: string; display_name: string; verified: boolean; avatar_url: string | null } | null
 }
 
 function mapListing(row: ListingRow): Listing {
@@ -33,13 +33,14 @@ function mapListing(row: ListingRow): Listing {
       id: row.profiles?.id ?? row.seller_id,
       name: row.profiles?.display_name ?? 'Seller',
       verified: row.profiles?.verified ?? false,
+      avatarUrl: row.profiles?.avatar_url ?? undefined,
     },
   }
 }
 
 const SELECT = `
   id, title, description, price, negotiable, image_url, images, location, condition, category, created_at, seller_id,
-  profiles ( id, display_name, verified )
+  profiles ( id, display_name, verified, avatar_url )
 `
 
 export async function getListings() {
@@ -122,4 +123,4 @@ export async function updateListing(id: string, input: UpdateListingInput) {
 export async function deleteListing(id: string) {
   const { error } = await supabase.from('listings').delete().eq('id', id)
   if (error) throw error
-  }
+    }
