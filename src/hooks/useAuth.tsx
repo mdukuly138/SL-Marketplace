@@ -7,6 +7,7 @@ interface AuthContextValue {
   user: User | null
   loading: boolean
   isAdmin: boolean
+  isVerified: boolean
   signOut: () => Promise<void>
 }
 
@@ -16,6 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [isVerified, setIsVerified] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -32,10 +34,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const userId = session?.user?.id
-    if (!userId) { setIsAdmin(false); return }
+    if (!userId) { setIsAdmin(false); setIsVerified(false); return }
     let active = true
-    supabase.from('profiles').select('is_admin').eq('id', userId).maybeSingle().then(({ data }) => {
-      if (active) setIsAdmin(data?.is_admin ?? false)
+    supabase.from('profiles').select('is_admin, verified').eq('id', userId).maybeSingle().then(({ data }) => {
+      if (!active) return
+      setIsAdmin(data?.is_admin ?? false)
+      setIsVerified(data?.verified ?? false)
     })
     return () => { active = false }
   }, [session?.user?.id])
@@ -45,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, isAdmin, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, isAdmin, isVerified, signOut }}>
       {children}
     </AuthContext.Provider>
   )
@@ -55,4 +59,4 @@ export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
   return ctx
-  }
+}
