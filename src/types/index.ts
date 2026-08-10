@@ -19,7 +19,7 @@ export interface Listing {
   location: string
   condition: Condition
   category: string
-  seller: Pick<Seller, 'id' | 'name' | 'verified'>
+  seller: Pick<Seller, 'id' | 'name' | 'verified' | 'avatarUrl'>
   createdAt: string
 }
 
