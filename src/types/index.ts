@@ -1,4 +1,5 @@
 export type Condition = 'new' | 'like-new' | 'used'
+export type ListingStatus = 'pending' | 'approved' | 'rejected'
 
 export interface Seller {
   id: string
@@ -19,6 +20,7 @@ export interface Listing {
   location: string
   condition: Condition
   category: string
+  status: ListingStatus
   seller: Pick<Seller, 'id' | 'name' | 'verified' | 'avatarUrl'>
   createdAt: string
 }
