@@ -46,7 +46,7 @@ export async function sendMessage(conversationId: string, senderId: string, cont
   return mapMessage(data)
 }
 
-export async function markConversationRead(conversationId: string, userId: string, isBuyer: boolean) {
+export async function markConversationRead(conversationId: string, _userId: string, isBuyer: boolean) {
   const field = isBuyer ? 'last_read_buyer_at' : 'last_read_seller_at'
   await supabase.from('conversations').update({ [field]: new Date().toISOString() }).eq('id', conversationId)
-    }
+}
