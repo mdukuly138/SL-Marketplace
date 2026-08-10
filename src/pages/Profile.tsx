@@ -1,9 +1,12 @@
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Store, Receipt, Heart, Settings, ChevronRight, ShieldCheck, LogOut } from 'lucide-react'
+import { Store, Receipt, Heart, Settings, ChevronRight, ShieldCheck, LogOut, Camera } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ShareButton } from '@/components/ui/ShareButton'
 import { useAuth } from '@/hooks/useAuth'
+import { getProfile, updateProfile } from '@/services/profiles'
+import { uploadAvatar } from '@/services/storage'
 
 const menuItems = [
   { icon: Store, label: 'My listings', hint: "Manage what you're selling", to: '/my-listings' },
@@ -14,6 +17,32 @@ const menuItems = [
 
 export function Profile() {
   const { user, loading, signOut } = useAuth()
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>()
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!user) return
+    let active = true
+    getProfile(user.id).then((profile) => {
+      if (active && profile) setAvatarUrl(profile.avatarUrl)
+    })
+    return () => { active = false }
+  }, [user])
+
+  async function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !user) return
+    setUploading(true)
+    try {
+      const url = await uploadAvatar(file, user.id)
+      await updateProfile(user.id, { avatarUrl: url })
+      setAvatarUrl(url)
+    } finally {
+      setUploading(false)
+    }
+  }
 
   return (
     <div className="px-4 pt-6 pb-8">
@@ -21,12 +50,31 @@ export function Profile() {
 
       <Card className="p-5 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-full bg-elevated flex items-center justify-center font-bold text-lg">
-            {user ? user.email!.slice(0, 2).toUpperCase() : 'GS'}
-          </div>
+          <button
+            type="button"
+            onClick={() => user && fileInputRef.current?.click()}
+            disabled={!user || uploading}
+            className="relative w-14 h-14 rounded-full bg-elevated flex items-center justify-center font-bold text-lg overflow-hidden shrink-0"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Your profile" className="w-full h-full object-cover" />
+            ) : user ? (
+              user.email!.slice(0, 2).toUpperCase()
+            ) : (
+              'GS'
+            )}
+            {user && (
+              <span className="absolute bottom-0 inset-x-0 bg-black/50 py-0.5 flex items-center justify-center">
+                <Camera className="w-3 h-3 text-white" />
+              </span>
+            )}
+          </button>
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
           <div>
             <p className="font-semibold">{user ? user.email : 'Guest'}</p>
-            <p className="text-muted text-xs">{loading ? 'Loading...' : user ? 'Signed in' : 'Not signed in'}</p>
+            <p className="text-muted text-xs">
+              {uploading ? 'Uploading photo...' : loading ? 'Loading...' : user ? 'Signed in' : 'Not signed in'}
+            </p>
           </div>
         </div>
 
