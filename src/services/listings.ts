@@ -1,4 +1,4 @@
-  import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import type { Listing } from '@/types'
 
 type ListingRow = {
@@ -12,6 +12,7 @@ type ListingRow = {
   location: string
   condition: 'new' | 'like-new' | 'used'
   category: string
+  status: 'pending' | 'approved' | 'rejected'
   created_at: string
   seller_id: string
   profiles: { id: string; display_name: string; verified: boolean; avatar_url: string | null } | null
@@ -28,6 +29,7 @@ function mapListing(row: ListingRow): Listing {
     location: row.location,
     condition: row.condition,
     category: row.category,
+    status: row.status,
     createdAt: row.created_at,
     seller: {
       id: row.profiles?.id ?? row.seller_id,
@@ -39,12 +41,16 @@ function mapListing(row: ListingRow): Listing {
 }
 
 const SELECT = `
-  id, title, description, price, negotiable, image_url, images, location, condition, category, created_at, seller_id,
+  id, title, description, price, negotiable, image_url, images, location, condition, category, status, created_at, seller_id,
   profiles ( id, display_name, verified, avatar_url )
 `
 
 export async function getListings() {
-  const { data, error } = await supabase.from('listings').select(SELECT).order('created_at', { ascending: false })
+  const { data, error } = await supabase
+    .from('listings')
+    .select(SELECT)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
   if (error) throw error
   return (data as unknown as ListingRow[]).map(mapListing)
 }
@@ -55,7 +61,20 @@ export async function getListingById(id: string) {
   return data ? mapListing(data as unknown as ListingRow) : null
 }
 
+// Public-facing: only approved listings show on a seller's public profile
 export async function getListingsBySeller(sellerId: string) {
+  const { data, error } = await supabase
+    .from('listings')
+    .select(SELECT)
+    .eq('seller_id', sellerId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data as unknown as ListingRow[]).map(mapListing)
+}
+
+// Owner-facing: shows all of a seller's own listings regardless of status
+export async function getMyListings(sellerId: string) {
   const { data, error } = await supabase
     .from('listings')
     .select(SELECT)
@@ -123,4 +142,4 @@ export async function updateListing(id: string, input: UpdateListingInput) {
 export async function deleteListing(id: string) {
   const { error } = await supabase.from('listings').delete().eq('id', id)
   if (error) throw error
-    }
+}
