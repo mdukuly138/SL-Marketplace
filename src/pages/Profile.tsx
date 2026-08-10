@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
 
 const menuItems = [
-  { icon: Store, label: 'My listings', hint: "Manage what you're selling" },
-  { icon: Receipt, label: 'My posts', hint: 'Your Home feed activity' },
-  { icon: Heart, label: 'Favorites', hint: 'Saved listings' },
-  { icon: Settings, label: 'Settings', hint: 'Account & preferences' },
+  { icon: Store, label: 'My listings', hint: "Manage what you're selling", to: '/my-listings' },
+  { icon: Receipt, label: 'My posts', hint: 'Your Home feed activity', to: null },
+  { icon: Heart, label: 'Favorites', hint: 'Saved listings', to: null },
+  { icon: Settings, label: 'Settings', hint: 'Account & preferences', to: null },
 ]
 
 export function Profile() {
@@ -54,18 +54,30 @@ export function Profile() {
       </Card>
 
       <div className="space-y-2">
-        {menuItems.map(({ icon: Icon, label, hint }) => (
-          <button key={label} className="w-full flex items-center gap-3 p-3 rounded-2xl bg-surface border border-border">
-            <div className="w-10 h-10 rounded-full bg-elevated flex items-center justify-center">
-              <Icon className="w-4 h-4 text-ember" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-semibold">{label}</p>
-              <p className="text-muted text-xs">{hint}</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-muted" />
-          </button>
-        ))}
+        {menuItems.map(({ icon: Icon, label, hint, to }) => {
+          const content = (
+            <>
+              <div className="w-10 h-10 rounded-full bg-elevated flex items-center justify-center">
+                <Icon className="w-4 h-4 text-ember" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-sm font-semibold">{label}</p>
+                <p className="text-muted text-xs">{hint}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted" />
+            </>
+          )
+
+          return to ? (
+            <Link key={label} to={to} className="w-full flex items-center gap-3 p-3 rounded-2xl bg-surface border border-border">
+              {content}
+            </Link>
+          ) : (
+            <button key={label} className="w-full flex items-center gap-3 p-3 rounded-2xl bg-surface border border-border opacity-60">
+              {content}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
