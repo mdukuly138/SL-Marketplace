@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Store, Receipt, Heart, Settings, ChevronRight, ShieldCheck, LogOut } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { ShareButton } from '@/components/ui/ShareButton'
 import { useAuth } from '@/hooks/useAuth'
 
 const menuItems = [
@@ -52,6 +53,15 @@ export function Profile() {
           </p>
         </div>
       </Card>
+
+      <div className="mb-2">
+        <ShareButton
+          label="Share SL Marketplace"
+          title="SL Marketplace"
+          text="Buy and sell across Sierra Leone — check out SL Marketplace"
+          url={window.location.origin}
+        />
+      </div>
 
       <div className="space-y-2">
         {menuItems.map(({ icon: Icon, label, hint, to }) => {
