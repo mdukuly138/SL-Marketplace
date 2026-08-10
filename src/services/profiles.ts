@@ -31,3 +31,18 @@ export async function getProfile(id: string) {
   if (error) throw error
   return data ? mapProfile(data) : null
 }
+
+export interface UpdateProfileInput {
+  displayName?: string
+  avatarUrl?: string
+}
+
+export async function updateProfile(userId: string, input: UpdateProfileInput) {
+  const payload: Record<string, unknown> = {}
+  if (input.displayName !== undefined) payload.display_name = input.displayName
+  if (input.avatarUrl !== undefined) payload.avatar_url = input.avatarUrl
+
+  const { data, error } = await supabase.from('profiles').update(payload).eq('id', userId).select().single()
+  if (error) throw error
+  return data
+}
