@@ -71,11 +71,11 @@ export function Sell() {
     setLoading(true)
     try {
       const imageUrls = await uploadListingImages(photos.map((p) => p.file), user.id)
-      const listing = await createListing({
+      await createListing({
         title, description, price: Number(price), negotiable, images: imageUrls,
         location, condition, category, sellerId: user.id,
       })
-      navigate(`/listing/${listing.id}`)
+      navigate('/my-listings')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
@@ -86,7 +86,9 @@ export function Sell() {
   return (
     <div className="px-4 pt-6 pb-8">
       <h1 className="font-extrabold text-2xl mb-1">Create a listing</h1>
-      <p className="text-muted text-sm mb-6">Add up to {MAX_PHOTOS} photos from your gallery.</p>
+      <p className="text-muted text-sm mb-6">
+        Add up to {MAX_PHOTOS} photos. New listings are reviewed by an admin before they appear in Market.
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -95,11 +97,7 @@ export function Sell() {
             {photos.map((photo, i) => (
               <div key={i} className="relative aspect-square rounded-2xl overflow-hidden bg-elevated">
                 <img src={photo.previewUrl} alt="" className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removePhoto(i)}
-                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-base/80 flex items-center justify-center"
-                >
+                <button type="button" onClick={() => removePhoto(i)} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-base/80 flex items-center justify-center">
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -121,13 +119,7 @@ export function Sell() {
 
         <div>
           <label className="text-sm font-semibold mb-2 block">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe condition, features, reason for selling..."
-            rows={4}
-            className="w-full rounded-2xl bg-surface border border-border px-4 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ember/50 focus:border-ember/50 transition resize-none"
-          />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe condition, features, reason for selling..." rows={4} className="w-full rounded-2xl bg-surface border border-border px-4 py-3 text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-ember/50 focus:border-ember/50 transition resize-none" />
         </div>
 
         <div className="flex gap-3">
@@ -145,11 +137,7 @@ export function Sell() {
 
         <div>
           <label className="text-sm font-semibold mb-2 block">Category</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full h-12 rounded-2xl bg-surface border border-border px-4 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/50 focus:border-ember/50 transition"
-          >
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full h-12 rounded-2xl bg-surface border border-border px-4 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ember/50 focus:border-ember/50 transition">
             {categories.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
@@ -163,15 +151,7 @@ export function Sell() {
           <label className="text-sm font-semibold mb-2 block">Condition</label>
           <div className="flex gap-2">
             {conditions.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCondition(c)}
-                className={cn(
-                  'flex-1 h-11 rounded-2xl text-sm font-semibold border capitalize',
-                  condition === c ? 'bg-ember text-base border-ember' : 'bg-surface text-muted border-border',
-                )}
-              >
+              <button key={c} type="button" onClick={() => setCondition(c)} className={cn('flex-1 h-11 rounded-2xl text-sm font-semibold border capitalize', condition === c ? 'bg-ember text-base border-ember' : 'bg-surface text-muted border-border')}>
                 {c}
               </button>
             ))}
@@ -181,7 +161,7 @@ export function Sell() {
         {error && <p className="text-alert text-sm">{error}</p>}
 
         <Button type="submit" variant="primary" size="lg" className="w-full mt-2" disabled={loading}>
-          {loading ? 'Publishing...' : 'Publish listing'}
+          {loading ? 'Publishing...' : 'Submit for review'}
         </Button>
       </form>
     </div>
