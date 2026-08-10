@@ -39,3 +39,15 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
   const { data } = supabase.storage.from('avatars').getPublicUrl(path)
   return data.publicUrl
 }
+
+export async function uploadPostMedia(file: File, userId: string, mediaType: 'image' | 'video'): Promise<string> {
+  const processedFile = mediaType === 'image' ? await convertHeicIfNeeded(file) : file
+  const ext = processedFile.name.split('.').pop()
+  const path = `${userId}/${crypto.randomUUID()}.${ext}`
+
+  const { error } = await supabase.storage.from('posts').upload(path, processedFile)
+  if (error) throw error
+
+  const { data } = supabase.storage.from('posts').getPublicUrl(path)
+  return data.publicUrl
+    }
