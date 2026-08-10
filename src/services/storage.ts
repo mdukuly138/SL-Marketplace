@@ -27,3 +27,15 @@ export async function uploadListingImages(files: File[], userId: string): Promis
 
   return urls
 }
+
+export async function uploadAvatar(file: File, userId: string): Promise<string> {
+  const converted = await convertHeicIfNeeded(file)
+  const ext = converted.name.split('.').pop()
+  const path = `${userId}/avatar-${Date.now()}.${ext}`
+
+  const { error } = await supabase.storage.from('avatars').upload(path, converted, { upsert: true })
+  if (error) throw error
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+  return data.publicUrl
+}
