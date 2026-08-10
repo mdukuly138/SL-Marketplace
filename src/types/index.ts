@@ -1,5 +1,6 @@
 export type Condition = 'new' | 'like-new' | 'used'
 export type ListingStatus = 'pending' | 'approved' | 'rejected'
+export type MediaType = 'image' | 'video'
 
 export interface Seller {
   id: string
@@ -27,12 +28,13 @@ export interface Listing {
 
 export interface Post {
   id: string
-  author: Pick<Seller, 'id' | 'name' | 'avatarUrl' | 'verified'>
-  imageUrl?: string
-  videoPlaceholder?: boolean
-  caption: string
-  likes: number
-  comments: number
+  seller: Pick<Seller, 'id' | 'name' | 'avatarUrl' | 'verified'>
+  mediaUrl: string
+  mediaType: MediaType
+  caption: string | null
   listingId?: string
+  likeCount: number
+  commentCount: number
+  likedByMe: boolean
   createdAt: string
 }
