@@ -16,6 +16,7 @@ export default {
           light: '#F2C069',
           dark: '#C6832A',
         },
+        verified: '#1877F2',
         success: '#3FA66B',
         alert: '#E8613F',
       },
