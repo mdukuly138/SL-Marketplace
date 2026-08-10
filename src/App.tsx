@@ -18,6 +18,7 @@ import { AdminDashboard } from './pages/AdminDashboard'
 import { AdminListings } from './pages/AdminListings'
 import { AdminUsers } from './pages/AdminUsers'
 import { AdminPendingListings } from './pages/AdminPendingListings'
+import { CreatePost } from './pages/CreatePost'
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/admin/listings" element={<AdminListings />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/pending" element={<AdminPendingListings />} />
+          <Route path="/create-post" element={<CreatePost />} />
         </Route>
       </Routes>
     </AuthProvider>
