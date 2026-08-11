@@ -66,6 +66,7 @@ export function CreatePost() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
+    if (!user) return
     if (!file || !mediaType) {
       setError('Add a photo or short video to post.')
       return
@@ -134,4 +135,4 @@ export function CreatePost() {
       </form>
     </div>
   )
-      }
+}
